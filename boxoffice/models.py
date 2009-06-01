@@ -11,7 +11,6 @@ class TicketGroup(models.Model):
     quantity = models.IntegerField()
     min_tickets = models.IntegerField(default=1)
     max_tickets = models.IntegerField(default=4)
-    # price?
 
     def __unicode__(self):
         return self.name
@@ -20,11 +19,14 @@ class TicketGroup(models.Model):
         return self.start_date < datetime.now() < self.end_date
     registration_open.boolean = True
 
+    def seats_left(self):
+        return max(self.quantity - self.registrations.count(), 0)
+
     def get_quantity_options(self):
-        return range(self.min_tickets, self.max_tickets+1)
+        return range(self.min_tickets, min(self.seats_left(), self.max_tickets)+1) or [0]
 
 
-BOXOFFICE_HOLD_TIME = 1*60 # 30 minutes
+BOXOFFICE_HOLD_TIME = 30*60 # 30 minutes
 
 class TicketManager(models.Manager):
     def unclaimed(self):
@@ -41,7 +43,7 @@ class Ticket(models.Model):
     email = models.EmailField()
     organization = models.CharField(max_length=50, blank=True)
     website = models.URLField(blank=True)
-    other = models.TextField('Who are you/what do you do?')
+    other = models.TextField('Who are you/what do you do?', blank=True)
 
     objects = TicketManager()
 

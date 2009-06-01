@@ -9,7 +9,9 @@ TicketFormSet = modelformset_factory(Ticket, extra=0)
 
 def show_registration_table(request):
     return render_to_response('boxoffice/ticketgroup_table.html',
-                              {'ticket_groups': TicketGroup.objects.all()})
+                              {'ticket_groups': TicketGroup.objects.all(),
+                               'attendees': Ticket.objects.filter(active=True)})
+
 
 
 @require_POST
@@ -17,15 +19,17 @@ def start_registration(request):
 
     # get form data
     group_id = int(request.POST['group_id'])
-    num_tickets = int(request.POST.get('tickets', 1))
+    num_tickets = int(request.POST['num_tickets'])
 
     group = get_object_or_404(TicketGroup, pk=group_id)
 
-    # validate num_tickets
+    # ensure that these registrations are allowed for this TicketGroup
+    if not group.registration_open():
+        return HttpResponseBadRequest('registration for this event is not currently open')
     if num_tickets > group.max_tickets or num_tickets < group.min_tickets:
-        return HttpResponseBadRequest('Number of tickets requested must be between %s and %s' % (group.min_tickets, group.max_tickets))
-    if group.registrations.count() + num_tickets > group.quantity:
-        return HttpResponseBadRequest('Cannot fulfilly request, only %s tickets remain' % (group.quantity - group.registrations.count()))
+        return HttpResponseBadRequest('number of tickets requested must be between %s and %s' % (group.min_tickets, group.max_tickets))
+    if num_tickets > group.seats_left():
+        return HttpResponseBadRequest('cannot fulfilly request, only %s tickets remain' % (group.quantity - group.registrations.count()))
 
     # generate a new UUID and create the appropriate registrations
     new_uuid = uuid.uuid4().hex
@@ -34,7 +38,8 @@ def start_registration(request):
 
     formset = TicketFormSet(queryset=Ticket.objects.filter(uuid=new_uuid))
 
-    return render_to_response('boxoffice/register.html', {'formset':formset,
+    return render_to_response('boxoffice/register.html', {'ticket_group':group,
+                                                          'formset':formset,
                                                           'uuid':new_uuid})
 
 @require_POST

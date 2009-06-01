@@ -1,4 +1,4 @@
-<table>
+<table border=1 style="border: solid 1px; ">
     <tr>
         <th>Type</th>
         <th>Sales Start</th>
@@ -14,13 +14,19 @@
         <td>{{group.start_date|date}}</td>
         <td>{{group.end_date|date}}</td>
         <td>
-            <select type="option">
+            <select type="option" name="num_tickets">
             {% for n in group.get_quantity_options %}
                 <option value="{{n}}">{{n}}</option>
             {% endfor %}
             </select>
         </td>
-        <td><input type="submit" value="Get Tickets"></td>
+        <td>
+            {% if group.registration_open and group.seats_left %}
+            <input type="submit" value="Get Tickets">
+            {% else %}
+            <strong>Closed</strong>
+            {% endif %}
+        </td>
         </form>
     </tr>
     {% endfor %}

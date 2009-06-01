@@ -1,0 +1,17 @@
+<dl>
+{% for attendee in attendees %}
+<li>
+{% if attendee.website %}<a href="{{attendee.website}}">{% endif %}
+    {{attendee.first_name}} {{attendee.last_name}}
+{% if attendee.website %}</a>{% endif %}
+    <dl>
+        {% if attendee.organization %}
+            <dt>Organization<dt><dd>{{attendee.organization}}</dd>
+        {% endif %}
+        {% if attendee.other %}
+            <dt>About</dt><dd>{{attendee.other}}</dd>
+        {% endif %}
+    </dl>
+</li>
+{% endfor %}
+</dl>
