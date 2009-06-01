@@ -1,0 +1,10 @@
+<form method="POST" action="{% url complete_ticket_registration %}">
+    <input type="hidden" name="uuid" value="{{uuid}}" />
+    {{ formset.management_form }}
+    <ol>
+        {% for form in formset.forms %}
+        <li><ul> {{form.as_ul}} </ul></li>
+        {% endfor %}
+    </ol>
+    <input type="submit" value="Request Tickets" />
+</form>

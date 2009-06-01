@@ -1,0 +1,27 @@
+<table>
+    <tr>
+        <th>Type</th>
+        <th>Sales Start</th>
+        <th>Sales End</th>
+        <th>Quantity</th>
+        <th>&nbsp;</th>
+    </tr>
+    {% for group in ticket_groups %}
+    <tr>
+        <form method="POST" action="{% url start_ticket_registration %}">
+        <input type="hidden" name="group_id" value="{{group.id}}" />
+        <td>{{group.name}}</td>
+        <td>{{group.start_date|date}}</td>
+        <td>{{group.end_date|date}}</td>
+        <td>
+            <select type="option">
+            {% for n in group.get_quantity_options %}
+                <option value="{{n}}">{{n}}</option>
+            {% endfor %}
+            </select>
+        </td>
+        <td><input type="submit" value="Get Tickets"></td>
+        </form>
+    </tr>
+    {% endfor %}
+</table>
