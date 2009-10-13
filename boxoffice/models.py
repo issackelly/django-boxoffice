@@ -1,5 +1,6 @@
 from datetime import datetime
 import time
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -25,12 +26,11 @@ class TicketGroup(models.Model):
     def get_quantity_options(self):
         return range(self.min_tickets, min(self.seats_left(), self.max_tickets)+1) or [0]
 
-
-BOXOFFICE_HOLD_TIME = 30*60 # 30 minutes
+BOXOFFICE_HOLD_MINUTES = getattr(settings, 'BOXOFFICE_HOLD_MINUTES', 30)
 
 class TicketManager(models.Manager):
     def unclaimed(self):
-        cutoff = datetime.fromtimestamp(time.time()-BOXOFFICE_HOLD_TIME)
+        cutoff = datetime.fromtimestamp(time.time()-(BOXOFFICE_HOLD_MINUTES*60))
         return self.filter(active=False, registration_date__lt=cutoff)
 
 class Ticket(models.Model):

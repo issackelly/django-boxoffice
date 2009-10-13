@@ -12,8 +12,6 @@ def show_registration_table(request):
                               {'ticket_groups': TicketGroup.objects.all(),
                                'attendees': Ticket.objects.filter(active=True)})
 
-
-
 @require_POST
 def start_registration(request):
 
