@@ -8,7 +8,7 @@ from models import Ticket,TicketGroup
 TicketFormSet = modelformset_factory(Ticket, extra=0)
 
 def show_registration_table(request):
-    return render_to_response('boxoffice/ticketgroup_table.html',
+    return render_to_response('boxoffice/registration_table.html',
                               {'ticket_groups': TicketGroup.objects.all(),
                                'attendees': Ticket.objects.filter(active=True)})
 
